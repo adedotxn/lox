@@ -61,6 +61,8 @@ class Scanner {
             case '+': addToken(PLUS); break;
             case ';': addToken(SEMICOLON); break;
             case '*': addToken(STAR); break; 
+            
+            
             case '!': 
                 addToken(match("=") ? BANG_EQUAL : BANG);
                 break;
@@ -81,6 +83,8 @@ class Scanner {
                     addToken(SLASH);
                 }
                 break;
+            
+            
             case ' ':
             case '\r':
             case '\t':
@@ -90,10 +94,32 @@ class Scanner {
             case '\n':
                 line++;
                 break;
+
+
+            case '"': string(); break;
+
+
             default:
             Lox.error(line, "Unexpected character.");
             break;
         }
+    }
+
+    private void string() {
+        while(peek() != '"' && !isAtEnd())  {
+            if(peek() == '\n') line++; // multi-line strings 
+            advance();
+        }
+
+        if(isAtEnd()) {
+            Lox.error(line, "Unterminated String");
+            return;
+        }
+
+        advance(); // the closing '"'
+        
+        String value = source.substring(start+1, current - 1); // trim the surrounding quotes
+        addToken(STRING, value);
     }
 
     private boolean match(char expected) {
