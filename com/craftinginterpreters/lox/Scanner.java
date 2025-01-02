@@ -41,14 +41,14 @@ class Scanner {
         this.source = source;
     }
 
-    List<Tokens> scanTokens() {
+    List<Token> scanTokens() {
         while(!isAtEnd()) {
             // at the beginning of the next lexeme
             start = current;
             scanToken();
         }
 
-        token.add(new Token(EOF, "", null, line)); // "end of file" token
+        tokens.add(new Token(EOF, "", null, line)); // "end of file" token
         return tokens;
     }
 
@@ -86,10 +86,10 @@ class Scanner {
             
             
             case '!': 
-                addToken(match("=") ? BANG_EQUAL : BANG);
+                addToken(match('=') ? BANG_EQUAL : BANG);
                 break;
             case '=':
-                addToken(match("=") ? EQUAL_EQUAL : EQUAL);
+                addToken(match('=') ? EQUAL_EQUAL : EQUAL);
                 break;
             case '<':
                 addToken(match('=') ? LESS_EQUAL : LESS);
@@ -98,7 +98,7 @@ class Scanner {
                 addToken(match('=') ? GREATER_EQUAL : GREATER);
                 break;
             case '/':
-                if(match("/")) {
+                if(match('/')) {
                     // this will be a comment so we keep consuming till end of line 
                     while(peek() != '\n' && !isAtEnd()) advance();
                 } else {
@@ -157,7 +157,7 @@ class Scanner {
         while(isDigit(peek())) advance();
 
         // considering fractions
-        if(peek() == "." && isDigit(peekNext())) {
+        if(peek() == '.' && isDigit(peekNext())) {
             // we consume the "."
             advance();
 
