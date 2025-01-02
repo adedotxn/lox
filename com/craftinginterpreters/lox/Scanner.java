@@ -96,13 +96,33 @@ class Scanner {
                 break;
 
 
-            case '"': string(); break;
-
-
+            case '"': 
+                string(); 
+                break;
+            
             default:
-            Lox.error(line, "Unexpected character.");
-            break;
+                if(isDigit(c)) {
+                    number();
+                } else {
+                    Lox.error(line, "Unexpected character.");
+                }
+                break;
         }
+    }
+    
+    private void number() {
+        while(isDigit(peek())) advance();
+
+        // considering fractions
+        if(peek() == "." && isDigit(peekNext())) {
+            // we consume the "."
+            advance();
+
+            while(isDigit(peek())) advance(); // continue with the numbers
+        }
+
+        addToken(NUMBER,
+            Double.parseDouble(source.substring(start, current)));
     }
 
     private void string() {
@@ -122,6 +142,10 @@ class Scanner {
         addToken(STRING, value);
     }
 
+    private boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
+    }
+
     private boolean match(char expected) {
         if (isAtEnd()) return false;
         if(source.charAt(current) != expected) return false;
@@ -133,5 +157,10 @@ class Scanner {
     private char peek() {
         if (isAtEnd()) return '\0';
         return source.charAt(current);
+    }
+
+    private char peekNext() {
+        if(current + 1 >= source.length()) return '\0';
+        return source.charAt(current + 1);
     }
 }
