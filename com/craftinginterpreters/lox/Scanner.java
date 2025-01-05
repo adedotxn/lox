@@ -101,6 +101,19 @@ class Scanner {
                 if(match('/')) {
                     // this will be a comment so we keep consuming till end of line 
                     while(peek() != '\n' && !isAtEnd()) advance();
+                } else if(match('*')) {
+                    while(peek() != '*' && peekNext() != '/')  {
+                        if(isAtEnd()) {
+                            Lox.error(line, "Unterminated block comment");
+                        }
+
+                        if(peek() == '\n') line++;
+                        advance();
+                    }
+
+                    // consume the closing '*/'
+                    advance(); 
+                    advance();
                 } else {
                     addToken(SLASH);
                 }
