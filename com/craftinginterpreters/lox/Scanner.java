@@ -101,19 +101,28 @@ class Scanner {
                 if(match('/')) {
                     // this will be a comment so we keep consuming till end of line 
                     while(peek() != '\n' && !isAtEnd()) advance();
-                } else if(match('*')) {
-                    while(peek() != '*' && peekNext() != '/')  {
-                        if(isAtEnd()) {
-                            Lox.error(line, "Unterminated block comment");
+                } else if(match('*')) { // block comments
+                    int nesting_level = 1;
+                    while(nesting_level > 0 && !isAtEnd()) {
+                        // we do not want to exit early so start w/ nested block check
+                        // and then decrease nesting_level as we close blocks.
+                        if(peek() == '/' && peekNext() == '*') {
+                            nesting_level++;
+                            advance();
+                            advance();
+                        } else if (peek() == '*' && peekNext() == '/') {
+                            nesting_level--;
+                            advance();
+                            advance();
+                        } else {
+                            if(peek() == '\n') line++;
+                            advance();
                         }
-
-                        if(peek() == '\n') line++;
-                        advance();
                     }
-
-                    // consume the closing '*/'
-                    advance(); 
-                    advance();
+                    
+                    if(nesting_level > 0) {
+                        Lox.error(line, "Unterminated block comment");
+                    }
                 } else {
                     addToken(SLASH);
                 }
