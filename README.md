@@ -29,4 +29,5 @@
     - References: [https://www.reddit.com/r/Compilers/comments/1b6u8yx/question_how_does_spaces_affect_code_is_parsed_in/](https://www.reddit.com/r/Compilers/comments/1b6u8yx/question_how_does_spaces_affect_code_is_parsed_in/), [https://stackoverflow.com/questions/9014970/why-does-coffeescript-require-whitespace-after-map](https://stackoverflow.com/questions/9014970/why-does-coffeescript-require-whitespace-after-map), [https://stackoverflow.com/questions/37796947/spaces-inserted-by-the-c-preprocessor](https://stackoverflow.com/questions/37796947/spaces-inserted-by-the-c-preprocessor)
 
 - **Adding support for block comments**
-    - WIP
+    - https://github.com/adedotxn/lox/commit/083b92b678fbf9079d9adb7bad007bf37ad3f199
+    - https://github.com/adedotxn/lox/commit/ef34d77ad969077d757fca2be3a7a6acc992a161
