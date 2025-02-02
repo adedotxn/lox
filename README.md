@@ -36,3 +36,9 @@
     - https://github.com/adedotxn/lox/commit/083b92b678fbf9079d9adb7bad007bf37ad3f199
     - https://github.com/adedotxn/lox/commit/ef34d77ad969077d757fca2be3a7a6acc992a161
     -  **Is adding support for nesting more work than you expected? Why?** - Yes, at first it was but rethinking my approach it turned out not to be, if we simply use a tracker to track block depths and decrement the counters on each closed block, we can effectively handle nested block comments. This is more work only in the sense that there's an internal tracker to keep.
+
+## Chapter 5
+Compiling and running the Abstract Syntax Tree Generator:
+
+- **compile** : `javac com/craftinginterpreters/tool/GenerateAst.java`
+- **run** the tool: `java com.craftinginterpreters.tool.GenerateAst com/craftinginterpreters/lox`
