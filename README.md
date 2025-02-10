@@ -42,3 +42,34 @@ Compiling and running the Abstract Syntax Tree Generator:
 
 - **compile** : `javac com/craftinginterpreters/tool/GenerateAst.java`
 - **run** the tool: `java com.craftinginterpreters.tool.GenerateAst com/craftinginterpreters/lox`
+
+**Challenges**
+1. ```
+    expr → expr ( "(" ( expr ( "," expr )* )? ")" | "." IDENTIFIER )+
+     | IDENTIFIER
+     | NUMBER
+    ```
+    An equivalent grammar that matches the language but does not use any of the notational sugar **(My solution)**:
+
+    ```
+        expr → expr group_1 
+        expr → IDENTIFIER 
+        expr → NUMBER
+
+        group_1 → "(" group_2 ")" group_1_tail
+        group_1 → "." IDENTIFIER group_1_tail
+
+        group_1_tail → group_1
+        group_1_tail → £
+
+        group_2 → expr group_3
+        group_2 → £
+
+        group_3 → "," expr group_3
+        group_3 → £
+    ```
+
+    I noticed I did have to come up with a way to imply an empty production because the example in the chapter did not have one.
+
+    
+
