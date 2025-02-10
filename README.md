@@ -68,8 +68,9 @@ Compiling and running the Abstract Syntax Tree Generator:
         group_3 → "," expr group_3
         group_3 → £
     ```
+    I noticed I did have to come up with/use a way to imply an empty production because the example in the chapter did not have one.
+    <img width="1523" alt="Untitled" src="https://github.com/user-attachments/assets/c22c0a3a-c2b2-4c9a-bdf5-66db3aa627f6" />
 
-    I noticed I did have to come up with a way to imply an empty production because the example in the chapter did not have one.
 
     
 
