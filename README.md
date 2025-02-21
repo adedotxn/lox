@@ -70,7 +70,7 @@ Compiling and running the Abstract Syntax Tree Generator:
     ```
     I noticed I did have to come up with/use a way to imply an empty production because the example in the chapter did not have one.
     <img width="1523" alt="Untitled" src="https://github.com/user-attachments/assets/c22c0a3a-c2b2-4c9a-bdf5-66db3aa627f6" />
-
+2. Defining a visitor class for our syntax tree classes that takes an expression, converts it to RPN, and returns the resulting string. [Commit Diff at filename: `com/craftinginterpreters/lox/RPNPrinter.java`](https://github.com/adedotxn/lox/commit/1574c84f540093abbc3abde1a2d9b7321b597c29#diff-2719416a6e0e348d673f68f7f0850d5295661df963a62b244127ac037ac82418)
 
     
 
