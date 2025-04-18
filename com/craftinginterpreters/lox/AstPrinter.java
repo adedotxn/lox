@@ -3,6 +3,7 @@ package com.craftinginterpreters.lox;
 import com.craftinginterpreters.lox.Expr.Binary;
 
 class AstPrinter implements Expr.Visitor<String> {
+
     String print(Expr expr) {
         return expr.accept(this);
     }
@@ -32,7 +33,7 @@ class AstPrinter implements Expr.Visitor<String> {
         StringBuilder builder = new StringBuilder();
 
         builder.append("(").append(name);
-        for(Expr expr: exprs) {
+        for (Expr expr : exprs) {
             builder.append(" ");
             builder.append(expr.accept(this));
         }
@@ -41,17 +42,16 @@ class AstPrinter implements Expr.Visitor<String> {
 
         return builder.toString();
     }
-
     /**
      * Example
      * -123 * (45.67)
      * becomes
      * (* (- 123) (group 45.67))
-     * juts a string representation of our AST is what is produced. 
+     * juts a string representation of our AST is what is produced.
      * the point is for visualisation
      */
-    
-    /** 
+
+    /**
     public static void main(String[] args) {
        Expr expression = new Expr.Binary(
            new Expr.Unary(
@@ -60,8 +60,8 @@ class AstPrinter implements Expr.Visitor<String> {
            new Token(TokenType.STAR, "*", null, 1),
            new Expr.Grouping(
                new Expr.Literal(45.67)));
-    
+
        System.out.println(new AstPrinter().print(expression));
-     } 
+     }
     */
 }
