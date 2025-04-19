@@ -73,4 +73,54 @@ Compiling and running the Abstract Syntax Tree Generator:
 2. Defining a visitor class for our syntax tree classes that takes an expression, converts it to RPN, and returns the resulting string. [Commit Diff at filename: `com/craftinginterpreters/lox/RPNPrinter.java`](https://github.com/adedotxn/lox/commit/1574c84f540093abbc3abde1a2d9b7321b597c29#diff-2719416a6e0e348d673f68f7f0850d5295661df963a62b244127ac037ac82418)
 
     
+## Chapter 5
+**Challenges**
+1. added support for comma expressions -> [here](https://github.com/adedotxn/lox/commit/5dae57913c14de194fd3059d36781e846b0b651b)
+    - updated grammar 
+    ```
 
+    expression     → comma ;
+    comma          → equality (, equality)* ;
+    equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+    comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+    term           → factor ( ( "-" | "+" ) factor )* ;
+    factor         → unary ( ( "/" | "*" ) unary )* ;
+    unary          → ( "!" | "-" ) unary
+                | primary ;
+    primary        → NUMBER | STRING | "true" | "false" | "nil"
+                | "(" expression ")" ;
+    ```
+
+2. Ternary operators are **right associative**. Associativity refers to how operators of the same precedence are grouped when they appear in a sequence without parenthesis. Determines the implicit parenthesization of the expression. Not to be confused with evalution order, which is a runtime behaviour whlie associativity has to do wuth parser structure. 
+`condition1 ? 1 : condition2 ? 2 : condition3 ? 3 : 4` will be parsed as `condition1 ? 1 : (condition2 ? 2 : (condition3 ? 3 : 4))`, sreuctured like an if/else.
+
+ 🧠 Parsing vs Precedence – Quick Note
+
+In expression parsing, operator precedence is enforced by the structure of the recursive descent parser, not during evaluation.
+
+ - Higher precedence operators appear lower in the grammar, so they get matched first during parsing.
+
+ - Lower precedence rules are higher in the grammar, but they only wrap what's already been parsed.
+
+ - The parser builds an expression tree, where tighter-binding (higher precedence) operations are deeper.
+
+ - Evaluation follows the tree, so precedence is already baked in.
+
+ `3 + 4 * 5
+`  is parsed as 
+```     +
+    / \
+   3   *
+      / \
+     4   5
+
+Binary(
+  left: Literal(3),
+  operator: '+',
+  right: Binary(
+    left: Literal(4),
+    operator: '*',
+    right: Literal(5)
+  )
+)
+```
