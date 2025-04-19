@@ -73,7 +73,7 @@ Compiling and running the Abstract Syntax Tree Generator:
 2. Defining a visitor class for our syntax tree classes that takes an expression, converts it to RPN, and returns the resulting string. [Commit Diff at filename: `com/craftinginterpreters/lox/RPNPrinter.java`](https://github.com/adedotxn/lox/commit/1574c84f540093abbc3abde1a2d9b7321b597c29#diff-2719416a6e0e348d673f68f7f0850d5295661df963a62b244127ac037ac82418)
 
     
-## Chapter 5
+## Chapter 6
 **Challenges**
 1. added support for comma expressions -> [here](https://github.com/adedotxn/lox/commit/5dae57913c14de194fd3059d36781e846b0b651b)
     - updated grammar 
