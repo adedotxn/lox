@@ -22,7 +22,45 @@ class Parser {
     }
 
     private Expr expression() {
-        return equality();
+        return comma();
+    }
+
+
+    
+
+   /**
+    * commas -> equality (, equality) // an example is `1,2,3,4`
+    * commas also has the lowest precedence
+    * 
+    * Here's what happens when parsing 1,2,3,4:
+    * We call equality() to parse the first part: 1
+    * We see a comma, so match(COMMA) returns true and consumes the comma token
+    * previous() now returns that comma token we just consumed
+    * We call equality() again to parse the next part: 2
+    * We create a binary expression: Binary(1, COMMA, 2)
+    * We see another comma, repeat steps 2-4
+    * We call equality() again to parse the next part: 3
+    * We create a binary expression: Binary(Binary(1, COMMA, 2), COMMA, 3)
+    * We see another comma, repeat steps 2-4
+    * We call equality() again to parse the next part: 4
+    * We create a binary expression: Binary(Binary(Binary(1, COMMA, 2), COMMA, 3), COMMA, 4)
+    * The result is a nested binary expression tree where each comma operator connects to the previous result
+    */
+    private Expr comma() {
+        Expr expr = equality();
+
+        while(match(COMMA)) {
+            // match() has just consumed the COMMA token, so previous() gives us that COMMA token
+            Token operator = previous();
+            
+            // Parse the right operand
+            Expr right = equality();
+
+            // Build a binary expression with the left expr, the comma operator, and the right expr
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
     }
 
     private Expr equality() {
