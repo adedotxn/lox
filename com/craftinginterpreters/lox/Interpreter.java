@@ -77,11 +77,16 @@ package com.craftinginterpreters.lox;
           checkNumberOperands(expr.operator, left, right);
           return (double)left - (double)right;
         case PLUS:
-          if (left instanceof Double && right instanceof Double) {
+          if (isNumber(left) && isNumber(right)) {
             return (double)left + (double)right;
           }
-          if (left instanceof String && right instanceof String) {
+          
+          if (isString(left) && isString(right)) {
             return (String)left + (String)right;
+          }
+
+          if (isString(left) || isString(right)) {
+            return stringify(left) + stringify(right);
           }
 
           throw new RuntimeError(expr.operator,
@@ -111,6 +116,14 @@ package com.craftinginterpreters.lox;
       return a.equals(b);
     }
 
+    boolean isString(Object value) {
+      return value instanceof String;
+    }
+
+    boolean isNumber(Object value) {
+      return value instanceof Double;
+    }
+  
     private String stringify(Object object) {
       if (object == null) return "nil";
 
