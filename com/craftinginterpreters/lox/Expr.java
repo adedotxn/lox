@@ -19,9 +19,6 @@ abstract class Expr {
 
         @Override
         <R> R accept(Visitor<R> visitor) {
-          // visitor will be the AstPrinter (or any other visitor class) that called accept()
-          // 'this' is the current Binary expression
-          // It calls visitBinaryExpr back on the AstPrinter, sending itself as the argument
           return visitor.visitBinaryExpr(this);
         }
 
