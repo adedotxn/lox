@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Parser {
+
     private static class ParseError extends RuntimeException {}
-    
+
     private final List<Token> tokens;
     private int current = 0;
 
@@ -14,19 +15,17 @@ class Parser {
         this.tokens = tokens;
     }
 
-    // Expr parse() {
-    //     try {
-    //        return expression();
-    //     } catch (ParseError e) {
-    //         return null;
-    //     }
-    // }
+    /**
+     * The parse() method is the entry point for parsing. It calls the statement() method to start parsing statements.
+     * It continues parsing until it reaches the end of the token list, collecting all parsed statements into a list.
+     * Finally, it returns the list of statements.
+     */
 
     List<Stmt> parse() {
         List<Stmt> statements = new ArrayList<>();
 
-        while(!isAtEnd()) {
-            statements.add(statement());
+        while (!isAtEnd()) {
+            statements.add(declaration());
         }
 
         return statements;
@@ -36,9 +35,19 @@ class Parser {
         return comma();
     }
 
+    private Stmt declaration() {
+        try {
+            if (match(VAR)) return varDeclaration();
+            return statement();
+        } catch (ParseError e) {
+            synchronize();
+            return null;
+        }
+    }
 
     private Stmt statement() {
-        if(match(PRINT)) return printStatement();
+        if (match(PRINT)) return printStatement();
+        if (match(LEFT_BRACE)) return new Stmt.Block(block());
 
         return expressionStatement();
     }
@@ -49,42 +58,87 @@ class Parser {
         return new Stmt.Print(value);
     }
 
+    private Stmt varDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect variable name.");
+
+        Expr initializer = null;
+        if (match(EQUAL)) {
+            initializer = expression();
+        }
+
+        consume(SEMICOLON, "Expect ';' after variable declaration.");
+        return new Stmt.Var(name, initializer);
+    }
+
     private Stmt expressionStatement() {
         Expr expr = expression();
         consume(SEMICOLON, "Expect ';' after expression.");
         return new Stmt.Expression(expr);
     }
 
-   /**
-    * commas -> equality (, equality) // an example is `1,2,3,4`
-    * commas also has the lowest precedence
-    * 
-    * Here's what happens when parsing 1,2,3,4:
-    * We call equality() to parse the first part: 1
-    * We see a comma, so match(COMMA) returns true and consumes the comma token
-    * previous() now returns that comma token we just consumed
-    * We call equality() again to parse the next part: 2
-    * We create a binary expression: Binary(1, COMMA, 2)
-    * We see another comma, repeat steps 2-4
-    * We call equality() again to parse the next part: 3
-    * We create a binary expression: Binary(Binary(1, COMMA, 2), COMMA, 3)
-    * We see another comma, repeat steps 2-4
-    * We call equality() again to parse the next part: 4
-    * We create a binary expression: Binary(Binary(Binary(1, COMMA, 2), COMMA, 3), COMMA, 4)
-    * The result is a nested binary expression tree where each comma operator connects to the previous result
-    */
-    private Expr comma() {
-        Expr expr = equality();
 
-        while(match(COMMA)) {
+    private List<Stmt> block() {
+        List<Stmt> statements = new ArrayList<>();
+
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            statements.add(declaration());
+        }
+
+        consume(RIGHT_BRACE, "Expect '}' after block.");
+        return statements;
+    }
+
+    /**
+     * commas -> equality (, equality) // an example is `1,2,3,4`
+     * commas also has the lowest precedence
+     *
+     * Here's what happens when parsing 1,2,3,4:
+     * We call equality() to parse the first part: 1
+     * We see a comma, so match(COMMA) returns true and consumes the comma token
+     * previous() now returns that comma token we just consumed
+     * We call equality() again to parse the next part: 2
+     * We create a binary expression: Binary(1, COMMA, 2)
+     * We see another comma, repeat steps 2-4
+     * We call equality() again to parse the next part: 3
+     * We create a binary expression: Binary(Binary(1, COMMA, 2), COMMA, 3)
+     * We see another comma, repeat steps 2-4
+     * We call equality() again to parse the next part: 4
+     * We create a binary expression: Binary(Binary(Binary(1, COMMA, 2), COMMA, 3), COMMA, 4)
+     * The result is a nested binary expression tree where each comma operator connects to the previous result
+     * 
+     * EDIT: now updated the rule to be `comma -> assignment`
+     */
+    private Expr comma() {
+        Expr expr = assignment();
+
+        while (match(COMMA)) {
             // match() has just consumed the COMMA token, so previous() gives us that COMMA token
             Token operator = previous();
-            
+
             // Parse the right operand
-            Expr right = equality();
+            Expr right = assignment();
 
             // Build a binary expression with the left expr, the comma operator, and the right expr
             expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    private Expr assignment() {
+        Expr expr = equality();
+
+        if(match(EQUAL)) {
+            Token equals = previous();
+            Expr value = assignment();
+
+            if(expr instanceof Expr.Variable) {
+                Token name = ((Expr.Variable) expr).name;
+                return new Expr.Assign(name, value);
+            }
+
+            
+            error(equals, "Invalid assignment target.");
         }
 
         return expr;
@@ -97,15 +151,14 @@ class Parser {
             Token operator = previous();
             Expr right = comparison();
             expr = new Expr.Binary(expr, operator, right);
-        };
-
+        }
         return expr;
-    };
+    }
 
     private Expr comparison() {
         Expr expr = term();
 
-        while(match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
+        while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
             Token operator = previous();
             Expr right = term();
             expr = new Expr.Binary(expr, operator, right);
@@ -117,7 +170,7 @@ class Parser {
     private Expr term() {
         Expr expr = factor();
 
-        while(match(MINUS, PLUS)) {
+        while (match(MINUS, PLUS)) {
             Token operator = previous();
             Expr right = factor();
             expr = new Expr.Binary(expr, operator, right);
@@ -129,7 +182,7 @@ class Parser {
     private Expr factor() {
         Expr expr = unary();
 
-        while(match(SLASH, STAR)) {
+        while (match(SLASH, STAR)) {
             Token operator = previous();
             Expr right = unary();
             expr = new Expr.Binary(expr, operator, right);
@@ -139,7 +192,7 @@ class Parser {
     }
 
     private Expr unary() {
-        if(match(BANG, MINUS)) {
+        if (match(BANG, MINUS)) {
             Token operator = previous();
             Expr right = unary();
             return new Expr.Unary(operator, right);
@@ -149,27 +202,31 @@ class Parser {
     }
 
     private Expr primary() {
-        if(match(FALSE)) return new Expr.Literal(false);
-        if(match(TRUE)) return new Expr.Literal(true);
-        if(match(NIL)) return new Expr.Literal(null);
+        if (match(FALSE)) return new Expr.Literal(false);
+        if (match(TRUE)) return new Expr.Literal(true);
+        if (match(NIL)) return new Expr.Literal(null);
 
-        if(match(NUMBER, STRING)) {
+        if (match(NUMBER, STRING)) {
             return new Expr.Literal(previous().literal);
         }
 
-        if(match(LEFT_PAREN)) {
+        if (match(IDENTIFIER)) {
+            return new Expr.Variable(previous());
+        }
+
+        if (match(LEFT_PAREN)) {
             Expr expr = expression();
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
         }
 
         throw error(peek(), "Expect expression.");
-    };
+    }
 
     // checks if current token is of type and consumes it if it is, otherwise returns false and leaves the current token alone
-    private boolean match(TokenType ...types) {
-        for(TokenType type: types) {
-            if(check(type)) {
+    private boolean match(TokenType... types) {
+        for (TokenType type : types) {
+            if (check(type)) {
                 advance();
                 return true;
             }
@@ -179,19 +236,19 @@ class Parser {
     }
 
     private Token consume(TokenType type, String message) {
-        if(check(type)) return advance();
+        if (check(type)) return advance();
 
         throw error(peek(), message);
     }
 
     private boolean check(TokenType type) {
-        if(isAtEnd()) return false;
+        if (isAtEnd()) return false;
         return peek().type == type;
     }
 
     // consumes the current token and returns it
     private Token advance() {
-        if(!isAtEnd()) current++;
+        if (!isAtEnd()) current++;
         return previous();
     }
 
@@ -221,13 +278,13 @@ class Parser {
     // It discards tokens until it thinks it has found a statement boundary. After catching a ParseError, we’ll call this and then we are hopefully back in sync.
     private void synchronize() {
         advance();
-        
-        // we syncronize on statement boundaries, and we know that a statement ends with a semicolon or mostly start with a keyword. 
-        // When next token is any of those, we're prob about to start a statement
-        while(!isAtEnd()) {
-            if(previous().type == SEMICOLON) return;
 
-            switch(peek().type) {
+        // we syncronize on statement boundaries, and we know that a statement ends with a semicolon or mostly start with a keyword.
+        // When next token is any of those, we're prob about to start a statement
+        while (!isAtEnd()) {
+            if (previous().type == SEMICOLON) return;
+
+            switch (peek().type) {
                 case CLASS:
                 case FUN:
                 case VAR:
@@ -242,5 +299,4 @@ class Parser {
             advance();
         }
     }
-
 }
