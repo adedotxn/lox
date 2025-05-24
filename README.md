@@ -127,5 +127,19 @@ Binary(
 
 ## Chapter 8
 1. [Commit](https://github.com/adedotxn/lox/commit/38d9b6f716b694a5d8e66a8263d216dc7ec59490) -- This allows the REPL to execute statements, as well as evaluate an expression and display the result.
+![Screenshot from 2025-05-24 09-18-00](https://github.com/user-attachments/assets/3f24cee7-b2ef-46cf-8655-f920176c703d)
 
 2. [Commit](https://github.com/adedotxn/lox/commit/a03b7ebf203db0c0e7d6baffcbd7dfc7c815b1d9)
+   ![Screenshot from 2025-05-24 08-43-26](https://github.com/user-attachments/assets/603a8911-d9e6-4d94-a807-854a095097bf)
+
+3. ```
+   var a = 1;
+   
+   {
+       var a = a + 2;
+       print a;
+    }
+   ``` 
+This prints 3 in the block and 1 outside the block. "What did you expect it to do?" "Is it what you think it should do?" I expected it to behave like it did, outer scope does not affect the initialization in the inner scope (`var a` outside is different from `var a` inside the block, and rightfully so, despite having the same variable names, do not clash (environments ftw!!)) ..and yes, I think this is what it should do. 
+
+   
