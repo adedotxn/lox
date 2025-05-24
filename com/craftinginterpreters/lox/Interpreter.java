@@ -187,14 +187,19 @@ import java.util.List;
 
     @Override
     public Void visitVarStmt(Stmt.Var stmt) {
-      // Lox sets a variable to nil by default if it's not explictly initialized
-      Object value = null;
+      // Lox sets a variable to nil by default if it's not explictly initialized 
+      // **Edit: The above is no longer the case, as the challenge asks to be a little more explicit about variable initialization. Instead of implicitly initializing variables to nil
+      // Object value = null;
+      
       if (stmt.initializer != null) {
-        value = evaluate(stmt.initializer);
+        Object value = evaluate(stmt.initializer);
+        
+        // remember it uses bare strings for the keys
+        environment.define(stmt.name.lexeme, value);
+      } else {
+        environment.defineUninitialized(stmt.name.lexeme);
       }
   
-      // remember it uses bare strings for the keys
-      environment.define(stmt.name.lexeme, value);
       return null;
     }
 
