@@ -72,8 +72,10 @@ public class Lox {
 
     if (isReplMode && statements.size() == 1 && statements.get(0) instanceof Stmt.Expression) {
       Stmt.Expression exprStmt = (Stmt.Expression) statements.get(0);
-      Object result = interpreter.evaluateExpression(exprStmt.expression);
+      Object result = interpreter.evaluateExpression(exprStmt.expression); 
       System.out.println(stringify(result));
+
+      // this is basically like the former way interpreter.interpret used to work for expressions where it used evaluate instead of execute
     } else {
       interpreter.interpret(statements);
     }
