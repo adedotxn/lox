@@ -149,6 +149,10 @@ import java.util.List;
     private void execute(Stmt stmt) {
         stmt.accept(this);
     }
+    
+    public Object evaluateExpression(Expr expression) {
+      return evaluate(expression);
+    }
 
     // This new method executes a list of statements in the context of a given environment. 
     void executeBlock(

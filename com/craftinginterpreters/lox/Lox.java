@@ -16,6 +16,7 @@ public class Lox {
 
   static boolean hadError = false;
   static boolean hadRuntimeError = false;
+  private static boolean isReplMode = false;
 
   public static void main(String[] args) throws IOException {
     if (args.length > 1) {
@@ -34,11 +35,16 @@ public class Lox {
 
     if (hadError) System.exit(65);
     if (hadRuntimeError) System.exit(70);
+
+    
   };
 
   private static void runPrompt() throws IOException {
     InputStreamReader input = new InputStreamReader(System.in);
     BufferedReader reader = new BufferedReader(input);
+
+    isReplMode = true; 
+
 
     for(;;) {
         System.out.print("> ");
@@ -61,9 +67,16 @@ public class Lox {
 
     // Uncomment this to see the AST
     // System.out.println(new AstPrinter().print(expression));
+    
 
-    // interpreter.interpret(expression);
-    interpreter.interpret(statements);
+
+    if (isReplMode && statements.size() == 1 && statements.get(0) instanceof Stmt.Expression) {
+      Stmt.Expression exprStmt = (Stmt.Expression) statements.get(0);
+      Object result = interpreter.evaluateExpression(exprStmt.expression);
+      System.out.println(stringify(result));
+    } else {
+      interpreter.interpret(statements);
+    }
   }
 
 
@@ -89,6 +102,20 @@ public class Lox {
   static void runtimeError(RuntimeError error) {
     System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
     hadRuntimeError = true;
+  }
+
+  private static String stringify(Object object) {
+    if (object == null) return "nil";
+
+    if (object instanceof Double) {
+      String text = object.toString();
+      if (text.endsWith(".0")) {
+        text = text.substring(0, text.length() - 2);
+      }
+      return text;
+    }
+
+    return object.toString();
   }
 
 }
