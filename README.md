@@ -124,3 +124,8 @@ Binary(
   )
 )
 ```
+
+## Chapter 8
+1. [Commit](https://github.com/adedotxn/lox/commit/38d9b6f716b694a5d8e66a8263d216dc7ec59490) -- This allows the REPL to execute statements, as well as evaluate an expression and display the result.
+
+2. [Commit](https://github.com/adedotxn/lox/commit/a03b7ebf203db0c0e7d6baffcbd7dfc7c815b1d9)
